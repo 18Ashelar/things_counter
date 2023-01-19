@@ -1,14 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:things_counter/constants/custom_theme.dart';
 import 'package:things_counter/data_provider/models/counter/counter_color_details.dart';
+import 'package:things_counter/data_provider/models/counter/counter_history.dart';
 import 'package:things_counter/data_provider/repository/counter_repository.dart';
 import 'package:things_counter/screens/home_screen/home_screen.dart';
-
 import 'data_provider/models/counter/counter_details.dart';
 import 'data_provider/repository/counter_card_color_set.dart';
 
@@ -17,6 +15,8 @@ void main() async {
 
   Hive.registerAdapter(CounterColorDetailsAdapter());
   Hive.registerAdapter(CounterDetailsAdapter());
+    Hive.registerAdapter(CounterHistoryAdapter());
+
 
   runApp(const MyApp());
 }

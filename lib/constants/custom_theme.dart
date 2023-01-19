@@ -48,7 +48,7 @@ class CustomTheme {
     final ThemeData base = ThemeData.light();
     return base.copyWith(
         primaryColor: lightThemeColorsScheme().primary,
-        scaffoldBackgroundColor: lightThemeColorsScheme().background,
+        scaffoldBackgroundColor: lightThemeColorsScheme().primary,
         colorScheme: lightThemeColorsScheme(),
 
         //Color setup
@@ -82,7 +82,7 @@ class CustomTheme {
           shadowColor: lightThemeColorsScheme().shadow,
           titleTextStyle: TextStyle(
               color: lightThemeColorsScheme().onPrimary,
-              fontSize: 18.sp,
+              fontSize: 20.sp,
               fontWeight: FontWeight.w600),
           iconTheme: IconThemeData(
             color: lightThemeColorsScheme().onPrimary,

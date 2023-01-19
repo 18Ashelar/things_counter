@@ -55,10 +55,14 @@ dependencies:
   reorderable_grid_view: ^2.2.5
 
   #animated number flip
+  animations: ^2.0.7
   animated_flip_counter: ^0.2.5
   
   #color picker tool
   flutter_colorpicker: ^1.0.3
+
+  #date formatter 
+  intl: ^0.18.0
 
 
 

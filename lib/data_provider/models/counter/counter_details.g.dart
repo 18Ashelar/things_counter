@@ -25,13 +25,14 @@ class CounterDetailsAdapter extends TypeAdapter<CounterDetails> {
       decrementBy: fields[5] as int,
       resetBy: fields[6] as int,
       colorDetails: fields[7] as CounterColorDetails,
+      counterHistory: (fields[8] as List?)?.cast<CounterHistory>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, CounterDetails obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class CounterDetailsAdapter extends TypeAdapter<CounterDetails> {
       ..writeByte(6)
       ..write(obj.resetBy)
       ..writeByte(7)
-      ..write(obj.colorDetails);
+      ..write(obj.colorDetails)
+      ..writeByte(8)
+      ..write(obj.counterHistory);
   }
 
   @override

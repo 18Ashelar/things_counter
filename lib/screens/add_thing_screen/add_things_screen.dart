@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:things_counter/constants/custom_validator.dart';
 import 'package:things_counter/constants/extensions.dart';
+import 'package:things_counter/data_provider/models/counter/counter_history.dart';
 import 'package:things_counter/data_provider/repository/counter_card_color_set.dart';
 import '../../data_provider/models/counter/counter_color_details.dart';
 import '../../data_provider/models/counter/counter_details.dart';
@@ -17,7 +18,9 @@ import 'components/selected_color_button.dart';
 import 'components/submit_button.dart';
 
 class AddThingsScreen extends StatefulWidget {
-  const AddThingsScreen({super.key});
+  const AddThingsScreen({super.key, this.counterDetails});
+
+  final CounterDetails? counterDetails;
 
   @override
   State<AddThingsScreen> createState() => _AddThingsScreenState();
@@ -44,11 +47,30 @@ class _AddThingsScreenState extends State<AddThingsScreen>
   // String buttonIcon = "0xFF000000";
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.counterDetails != null) {
+      setEditData(widget.counterDetails!);
+    }
+  }
+
+  void setEditData(CounterDetails counterDetails) {
+    _name.text = counterDetails.counterName;
+    _counterValue.text = counterDetails.counterValue.toString();
+    _incrementCounterValue.text = counterDetails.incrementBy.toString();
+    _decrementCounterValue.text = counterDetails.decrementBy.toString();
+
+    _resetValueController.text = counterDetails.resetBy.toString();
+    _incrementCounterValue.text = counterDetails.incrementBy.toString();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
+        toolbarHeight: 70,
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -57,126 +79,136 @@ class _AddThingsScreenState extends State<AddThingsScreen>
             icon: const Icon(Icons.close_rounded)),
         title: const Text("Add Thing"),
       ),
-      body: SafeArea(child: SingleChildScrollView(
-        child: Consumer<CounterCardColorSet>(
-            builder: (context, colorProvider, child) {
-          return Form(
-            key: _formKey,
-            child: Container(
-              padding: EdgeInsets.all(5.h),
-              child: Column(children: [
-                // SizedBox(
-                //   height: 3.h,
-                // ),
-                CustomTextFormField(
-                  validator: (p0) => isEmpty(p0!),
-                  labelName: "Name",
-                  controller: _name,
+      body: Container(
+          height: 100.h,
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+          child: SingleChildScrollView(
+            child: Consumer<CounterCardColorSet>(
+                builder: (context, colorProvider, child) {
+              return Form(
+                key: _formKey,
+                child: Container(
+                  padding: EdgeInsets.all(5.h),
+                  child: Column(children: [
+                    // SizedBox(
+                    //   height: 3.h,
+                    // ),
+                    CustomTextFormField(
+                      validator: (p0) => isEmpty(p0!),
+                      labelName: "Name",
+                      controller: _name,
+                    ),
+                    SizedBox(
+                      height: 3.h,
+                    ),
+                    CustomTextFormField(
+                      validator: (p0) => isEmpty(p0!),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(6)
+                      ],
+                      labelName: "Counter Value",
+                      controller: _counterValue,
+                    ),
+                    SizedBox(
+                      height: 3.h,
+                    ),
+                    CustomTextFormField(
+                      validator: (p0) => isEmpty(p0!),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(6)
+                      ],
+                      labelName: "Increment By",
+                      controller: _incrementCounterValue,
+                    ),
+                    SizedBox(
+                      height: 3.h,
+                    ),
+                    CustomTextFormField(
+                      validator: (p0) => isEmpty(p0!),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(6)
+                      ],
+                      labelName: "Decrement By",
+                      controller: _decrementCounterValue,
+                    ),
+                    SizedBox(
+                      height: 3.h,
+                    ),
+                    CustomTextFormField(
+                      validator: (p0) => isEmpty(p0!),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(6)
+                      ],
+                      labelName: "Reset By",
+                      controller: _resetValueController,
+                    ),
+                    SizedBox(
+                      height: 5.h,
+                    ),
+                    SizedBox(
+                        width: double.infinity,
+                        height: 47,
+                        child: OutlinedButton(
+                            onPressed: () {
+                              counterPreview(context);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                  width: 1.0,
+                                  color: Theme.of(context).colorScheme.primary),
+                            ),
+                            child: const Text("Set Color"))),
+                    SizedBox(
+                      height: 3.h,
+                    ),
+                    SubmitButton(
+                      title: "Add Thing",
+                      width: double.infinity,
+                      onTap: () {
+                        if (_formKey.currentState!.validate()) {
+                          CounterDetails counterDetails = CounterDetails(
+                            id: UniqueKey().hashCode,
+                            counterValue: int.parse(_counterValue.text),
+                            counterName: _name.text,
+                            createdAt: DateTime.now().toString(),
+                            incrementBy: int.parse(_incrementCounterValue.text),
+                            decrementBy: int.parse(_decrementCounterValue.text),
+                            resetBy: int.parse(_resetValueController.text),
+                            colorDetails: CounterColorDetails(
+                                backgroundColor: colorProvider.background,
+                                textColor: colorProvider.text,
+                                buttonColor: colorProvider.button,
+                                buttonIcon: colorProvider.buttonIcon),
+                            counterHistory: <CounterHistory>[
+                              CounterHistory(
+                                  counterValue: int.parse(_counterValue.text),
+                                  createdAt: DateTime.now().toString(),
+                                  lastResetOn: "0")
+                            ],
+                          );
+                          log(counterDetails.toString());
+                          context
+                              .read<CounterRepository>()
+                              .createItem(counterDetails);
+                        }
+                      },
+                    ),
+                  ]),
                 ),
-                SizedBox(
-                  height: 3.h,
-                ),
-                CustomTextFormField(
-                  validator: (p0) => isEmpty(p0!),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(5)
-                  ],
-                  labelName: "Counter Value",
-                  controller: _counterValue,
-                ),
-                SizedBox(
-                  height: 3.h,
-                ),
-                CustomTextFormField(
-                  validator: (p0) => isEmpty(p0!),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(5)
-                  ],
-                  labelName: "Increment By",
-                  controller: _incrementCounterValue,
-                ),
-                SizedBox(
-                  height: 3.h,
-                ),
-                CustomTextFormField(
-                  validator: (p0) => isEmpty(p0!),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(5)
-                  ],
-                  labelName: "Decrement By",
-                  controller: _decrementCounterValue,
-                ),
-                SizedBox(
-                  height: 3.h,
-                ),
-                CustomTextFormField(
-                  validator: (p0) => isEmpty(p0!),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(5)
-                  ],
-                  labelName: "Reset By",
-                  controller: _resetValueController,
-                ),
-                SizedBox(
-                  height: 3.h,
-                ),
-                SizedBox(
-                    width: double.infinity,
-                    height: 47,
-                    child: OutlinedButton(
-                        onPressed: () {
-                          counterPreview(context);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              width: 1.0,
-                              color: Theme.of(context).colorScheme.primary),
-                        ),
-                        child: const Text("Set Color"))),
-                SizedBox(
-                  height: 3.h,
-                ),
-                SubmitButton(
-                  title: "Add Thing",
-                  width: double.infinity,
-                  onTap: () {
-                    if (_formKey.currentState!.validate()) {
-                      CounterDetails counterDetails = CounterDetails(
-                          id: UniqueKey().hashCode,
-                          counterValue: int.parse(_counterValue.text),
-                          counterName: _name.text,
-                          createdAt: DateTime.now().toString(),
-                          incrementBy: int.parse(_incrementCounterValue.text),
-                          decrementBy: int.parse(_decrementCounterValue.text),
-                          resetBy: int.parse(_resetValueController.text),
-                          colorDetails: CounterColorDetails(
-                              backgroundColor: colorProvider.background,
-                              textColor: colorProvider.text,
-                              buttonColor: colorProvider.button,
-                              buttonIcon: colorProvider.buttonIcon));
-                      log(counterDetails.toString());
-                      context
-                          .read<CounterRepository>()
-                          .createItem(counterDetails);
-                    }
-                  },
-                ),
-                SizedBox(
-                  height: 3.h,
-                ),
-              ]),
-            ),
-          );
-        }),
-      )),
+              );
+            }),
+          )),
     );
   }
 

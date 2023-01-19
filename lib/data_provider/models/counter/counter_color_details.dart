@@ -28,4 +28,18 @@ class CounterColorDetails {
   String toString() {
     return 'CounterColorDetails(backgroundColor: $backgroundColor, textColor: $textColor, buttonColor: $buttonColor, buttonIcon: $buttonIcon)';
   }
+
+  CounterColorDetails copyWith({
+    String? backgroundColor,
+    String? textColor,
+    String? buttonColor,
+    String? buttonIcon,
+  }) {
+    return CounterColorDetails(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+      buttonColor: buttonColor ?? this.buttonColor,
+      buttonIcon: buttonIcon ?? this.buttonIcon,
+    );
+  }
 }
